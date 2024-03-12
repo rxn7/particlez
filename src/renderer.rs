@@ -104,7 +104,7 @@ impl Renderer {
                     y += size;
                 }
                 _ => {
-                    let (metrics, bitmap): (Metrics, Vec<u8>) = font.rasterize(c, size as f32);
+                    let (metrics, bitmap): (Metrics, Vec<u8>) = font.rasterize(c, size);
 
                     for yo in 0..metrics.height {
                         for xo in 0..metrics.width {

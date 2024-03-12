@@ -27,15 +27,15 @@ pub struct Particle {
 
 impl Particle {
     pub fn new(position: Vec2, options: &ParticleOptions) -> Self {
-        return Self {
+        Self {
             position,
             size: options.start_size,
             velocity: options.velocity,
             color: options.start_color,
             gravity_force: 0.0,
             spawn_time: std::time::Instant::now(),
-            options: options.clone(),
-        };
+            options: *options,
+        }
     }
 
     pub fn age(&self) -> std::time::Duration {

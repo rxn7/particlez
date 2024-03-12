@@ -4,17 +4,12 @@ use rand::{distributions::uniform::SampleUniform, rngs::ThreadRng, Rng};
 use crate::particle::{Particle, ParticleOptions};
 use crate::color::Color;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub enum EmitShape {
+    #[default]
     Point,
     Circle(f32), // radius
     Rect(Vec2),  // size,
-}
-
-impl Default for EmitShape {
-    fn default() -> Self {
-        EmitShape::Point
-    }
 }
 
 #[derive(Default, Clone)]
