@@ -1,6 +1,7 @@
 use glam::Vec2;
 
 use crate::renderer::Renderer;
+use crate::color::Color;
 
 #[derive(Default, Clone, Copy)]
 pub struct ParticleOptions {
@@ -62,7 +63,7 @@ impl Particle {
         self.position += self.velocity * frame_delta.as_secs_f32()
             + Vec2::Y * self.gravity_force * frame_delta.as_secs_f32();
         self.color =
-            crate::color::lerp(self.options.start_color, self.options.end_color, age_ratio);
+            Color::lerp(self.options.start_color, self.options.end_color, age_ratio);
 
         renderer.draw_square(self.position, self.size, self.color);
         true

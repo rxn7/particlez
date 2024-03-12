@@ -10,8 +10,9 @@ use glam::Vec2;
 use minifb::*;
 use renderer::Renderer;
 
-const WIDTH: usize = 2560;
-const HEIGHT: usize = 1280;
+const WIDTH: usize = 640;
+const HEIGHT: usize = 480;
+const FONT_SIZE: f32 = 8.0;
 const EXPLOSION_EMITTER_OPTS: EmitterOptions = EmitterOptions {
     particle_count: 500,
     spawn_interval: None,
@@ -28,7 +29,6 @@ const EXPLOSION_EMITTER_OPTS: EmitterOptions = EmitterOptions {
     end_color: 0,
     end_color_variation: 0.0,
 };
-
 const SPARKS_EMITTER_OPTS: EmitterOptions = EmitterOptions {
     particle_count: 0,
     spawn_interval: Some(std::time::Duration::from_millis(50)),
@@ -62,11 +62,11 @@ fn main() {
     .expect("Unable to create window");
     window.limit_update_rate(None);
 
-    let font: &[u8] = include_bytes!("../resources/Minecraft.ttf") as &[u8];
+    let font: &[u8] = include_bytes!("../resources/dogicapixel.ttf") as &[u8];
     let font: Font = Font::from_bytes(
         font,
         FontSettings {
-            scale: 16.0,
+            scale: FONT_SIZE,
             ..Default::default()
         },
     )
@@ -123,8 +123,9 @@ fn main() {
             &font,
             format!("fps: {}\nparticles: {}", (1.0 / frame_delta.as_secs_f32()) as u32, particles.len()).as_str(),
             Vec2::ZERO,
-            16.0,
+            8.0,
             0xffffff,
+            false
         );
 
         renderer.display(&mut window);

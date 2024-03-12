@@ -2,6 +2,7 @@ use glam::Vec2;
 use rand::{distributions::uniform::SampleUniform, rngs::ThreadRng, Rng};
 
 use crate::particle::{Particle, ParticleOptions};
+use crate::color::Color;
 
 #[derive(Clone)]
 pub enum EmitShape {
@@ -109,14 +110,14 @@ fn range_or<T>(range: std::ops::Range<T>, or: T, rng: &mut ThreadRng) -> T
             self.options.start_color
         } else {
             let hue_shift: f32 = rng.gen_range(-self.options.start_color_variation..self.options.start_color_variation);
-            crate::color::hue_shift(self.options.start_color, hue_shift)
+            Color::hue_shift(self.options.start_color, hue_shift)
         };
 
         let end_color = if self.options.end_color_variation == 0.0 {
             self.options.end_color
         } else {
             let hue_shift: f32 = rng.gen_range(-self.options.end_color_variation..self.options.end_color_variation);
-            crate::color::hue_shift(self.options.end_color, hue_shift)
+            Color::hue_shift(self.options.end_color, hue_shift)
         };
 
         // TODO: Apply EmitShape
