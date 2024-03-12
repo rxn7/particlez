@@ -1,5 +1,8 @@
+use fontdue::*;
 use glam::Vec2;
 use minifb::Window;
+
+pub const SCALE_DIVISOR: usize = 5;
 
 pub struct Renderer {
     pixels: Vec<u32>,
@@ -9,11 +12,22 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(width: usize, height: usize) -> Self {
+        let width: usize = width / SCALE_DIVISOR;
+        let height: usize = height / SCALE_DIVISOR;
+
         Self {
             pixels: vec![0; width * height],
             width,
             height,
         }
+    }
+
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    pub fn height(&self) -> usize {
+        self.height
     }
 
     pub fn display(&self, window: &mut Window) {
@@ -22,15 +36,14 @@ impl Renderer {
             .expect("Failed to display framebuffer");
     }
 
-    pub fn canvas_size(&self) -> (usize, usize) {
-        (self.width, self.height)
-    }
-
     pub fn clear(&mut self) {
         self.pixels.fill(0);
     }
 
     pub fn resize(&mut self, width: usize, height: usize) {
+        let width: usize = width / SCALE_DIVISOR;
+        let height: usize = height / SCALE_DIVISOR;
+
         self.pixels = vec![0; width * height];
         self.width = width;
         self.height = height;
@@ -53,6 +66,38 @@ impl Renderer {
         for x in 0..size {
             for y in 0..size {
                 self.set_pixel(pos.x + x as f32, pos.y + y as f32, color);
+            }
+        }
+    }
+
+    pub fn draw_text(&mut self, font: &Font, text: &str, pos: Vec2, size: f32, color: u32) {
+        let mut x: f32 = pos.x;
+        let mut y: f32 = pos.y;
+
+        for c in text.chars() {
+            match c {
+                '\n' => {
+                    x = pos.x;
+                    y += size;
+                }
+                _ => {
+                    let (metrics, bitmap): (Metrics, Vec<u8>) = font.rasterize(c, size as f32);
+                    for yo in 0..metrics.height {
+                        for xo in 0..metrics.width {
+                            let value: u8 = bitmap[xo + yo * metrics.width];
+                            if value >= 100 {
+                                let x: f32 = x + xo as f32;
+                                let y: f32 = y + yo as f32;
+                                self.set_pixel(
+                                    x + metrics.xmin as f32,
+                                    y + size - metrics.height as f32 - metrics.ymin as f32,
+                                    color, // (color as f32 * (value as f32) / 255.0) as u32,
+                                );
+                            }
+                        }
+                    }
+                    x += metrics.advance_width;
+                }
             }
         }
     }

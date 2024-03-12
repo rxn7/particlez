@@ -3,6 +3,7 @@ use rand::{distributions::uniform::SampleUniform, rngs::ThreadRng, Rng};
 
 use crate::particle::{Particle, ParticleOptions};
 
+#[derive(Clone)]
 pub enum EmitShape {
     Point,
     Circle(f32), // radius
@@ -15,7 +16,7 @@ impl Default for EmitShape {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct EmitterOptions {
     pub particle_count: usize, // 0 -> inf
     pub spawn_interval: Option<std::time::Duration>,
@@ -25,24 +26,27 @@ pub struct EmitterOptions {
     pub start_size_range: std::ops::Range<u32>,
     pub end_size_range: std::ops::Range<u32>,
     pub lifetime_range_ms: std::ops::Range<u32>,
+    pub drag_coefficient_range: std::ops::Range<f32>,
     pub gravity: f32,
     pub start_color: u32,
+    pub start_color_variation: f32,
     pub end_color: u32,
+    pub end_color_variation: f32,
 }
 
 pub struct Emitter {
-    position: Vec2,
+    pub position: Vec2,
     options: EmitterOptions,
     remaining_particle_count: usize,
     last_emit_time: std::time::Instant,
 }
 
 impl Emitter {
-    pub fn new(position: Vec2, opts: EmitterOptions) -> Self {
+    pub fn new(position: Vec2, opts: &EmitterOptions) -> Self {
         let remaining_particle_count: usize = opts.particle_count;
         Self {
             position,
-            options: opts,
+            options: opts.clone(),
             remaining_particle_count,
             last_emit_time: std::time::Instant::now(),
         }
@@ -78,8 +82,7 @@ impl Emitter {
         }
 
         let mut rng: ThreadRng = rand::thread_rng();
-
-        fn range_or<T>(range: std::ops::Range<T>, or: T, rng: &mut ThreadRng) -> T
+fn range_or<T>(range: std::ops::Range<T>, or: T, rng: &mut ThreadRng) -> T
         where
             T: PartialOrd,
             T: SampleUniform,
@@ -99,14 +102,30 @@ impl Emitter {
 
         let direction: Vec2 = Vec2::new(angle.cos(), angle.sin());
         let velocity: Vec2 = direction * rng.gen_range(self.options.emit_velocity_range.clone());
+        let drag_coefficient: f32 =
+            range_or(self.options.drag_coefficient_range.clone(), 0.0, &mut rng);
+
+        let start_color = if self.options.start_color_variation == 0.0 {
+            self.options.start_color
+        } else {
+            let hue_shift: f32 = rng.gen_range(-self.options.start_color_variation..self.options.start_color_variation);
+            crate::color::hue_shift(self.options.start_color, hue_shift)
+        };
+
+        let end_color = if self.options.end_color_variation == 0.0 {
+            self.options.end_color
+        } else {
+            let hue_shift: f32 = rng.gen_range(-self.options.end_color_variation..self.options.end_color_variation);
+            crate::color::hue_shift(self.options.end_color, hue_shift)
+        };
 
         // TODO: Apply EmitShape
-
+        //
         particles.push(Particle::new(
             self.position,
-            ParticleOptions {
-                start_color: self.options.start_color,
-                end_color: self.options.end_color,
+            &ParticleOptions {
+                start_color,
+                end_color,
                 start_size,
                 end_size,
                 lifetime: std::time::Duration::from_millis(
@@ -115,6 +134,7 @@ impl Emitter {
                         .into(),
                 ),
                 gravity: self.options.gravity,
+                drag_coefficient,
                 velocity,
             },
         ))
