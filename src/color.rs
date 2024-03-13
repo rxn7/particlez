@@ -52,3 +52,50 @@ impl Color {
         Color::from_rgb(255 - r, 255 - g, 255 - b)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Color;
+
+    #[test]
+    fn to_rgb() {
+        let c = 0xFFAAEEu32;
+        let (r, g, b) = Color::to_rgb(c);
+        assert_eq!(r, 255);
+        assert_eq!(g, 170);
+        assert_eq!(b, 238);
+    }
+
+    #[test]
+    fn from_rgb() {
+        let (r, g, b) = (120, 50, 250);
+        let c = Color::from_rgb(r, g, b);
+        assert_eq!(c, 0x7832FAu32);
+    }
+
+    #[test]
+    fn to_rgbf() {
+        let c = 0xAAFF52u32;
+        let rgbf = Color::to_rgbf(c);
+        let c2 = Color::from_rgbf(rgbf);
+        assert_eq!(c, c2);
+    }
+
+    #[test]
+    fn from_rgbf() {
+        let c = 0x4D80B3u32;
+        let rgbf = Color::to_rgbf(c);
+        let c2 = Color::from_rgbf(rgbf);
+        assert_eq!(c, c2);
+    }
+
+    #[test]
+    fn negative() {
+        let c = 0x52a5a9u32;
+        let n = Color::negative(c);
+        let (r, g, b) = Color::to_rgb(n);
+        assert_eq!(r, 255 - 82);
+        assert_eq!(g, 255 - 165);
+        assert_eq!(b, 255 - 169);
+    }
+}
