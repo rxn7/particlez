@@ -1,7 +1,7 @@
 use glam::Vec2;
 
-use crate::renderer::Renderer;
 use crate::color::Color;
+use crate::renderer::Renderer;
 
 #[derive(Default, Clone, Copy)]
 pub struct ParticleOptions {
@@ -44,11 +44,6 @@ impl Particle {
 
     // Returns true if alive
     pub fn update(&mut self, frame_delta: std::time::Duration, renderer: &mut Renderer) -> bool {
-        // Delete itself if it's out of bounds, TODO: Size should be used
-        if self.position.y < 0.0 || self.position.y > renderer.height() as f32 || self.position.x < 0.0 || self.position.x > renderer.width() as f32 {
-            return false;
-        }
-
         if self.age() > self.options.lifetime {
             return false;
         }
@@ -63,8 +58,7 @@ impl Particle {
         self.gravity_force += self.options.gravity * frame_delta.as_secs_f32();
         self.position += self.velocity * frame_delta.as_secs_f32()
             + Vec2::Y * self.gravity_force * frame_delta.as_secs_f32();
-        self.color =
-            Color::lerp(self.options.start_color, self.options.end_color, age_ratio);
+        self.color = Color::lerp(self.options.start_color, self.options.end_color, age_ratio);
 
         renderer.draw_square(self.position, self.size, self.color);
         true

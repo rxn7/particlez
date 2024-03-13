@@ -4,7 +4,7 @@ use fontdue::*;
 use glam::Vec2;
 use minifb::Window;
 
-pub const SCALE_DIVISOR: usize = 8;
+pub const SCALE_DIVISOR: usize = 3;
 
 pub struct Renderer {
     pixels: Vec<u32>,
