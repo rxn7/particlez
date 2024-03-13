@@ -44,6 +44,7 @@ impl Particle {
 
     // Returns true if alive
     pub fn update(&mut self, frame_delta: std::time::Duration, renderer: &mut Renderer) -> bool {
+        // Delete itself if it's out of bounds, TODO: Size should be used
         if self.position.y < 0.0 || self.position.y > renderer.height() as f32 || self.position.x < 0.0 || self.position.x > renderer.width() as f32 {
             return false;
         }

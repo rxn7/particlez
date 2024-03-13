@@ -2,8 +2,11 @@ mod color;
 mod emitter;
 mod particle;
 mod renderer;
+mod fps_counter;
+
 use emitter::{EmitShape, Emitter, EmitterOptions};
 use particle::Particle;
+use fps_counter::FpsCounter;
 
 use fontdue::{Font, FontSettings};
 use glam::Vec2;
@@ -75,6 +78,7 @@ fn main() {
     let mut particles: Vec<Particle> = Vec::with_capacity(1000);
     let mut emitters: Vec<Emitter> = Vec::with_capacity(10);
     let mut renderer: Renderer = Renderer::new(WIDTH, HEIGHT);
+    let mut fps_counter: FpsCounter = FpsCounter::new();
 
     let mut last_win_size: (usize, usize) = window.get_size();
     let mut last_start_time: std::time::Instant = std::time::Instant::now();
@@ -88,6 +92,8 @@ fn main() {
     while window.is_open() {
         let frame_delta: std::time::Duration = last_start_time.elapsed();
         last_start_time = std::time::Instant::now();
+
+        fps_counter.tick();
 
         let win_size: (usize, usize) = window.get_size();
         if win_size != last_win_size {
@@ -121,7 +127,7 @@ fn main() {
 
         renderer.draw_text(
             &font,
-            format!("fps: {}\nparticles: {}", (1.0 / frame_delta.as_secs_f32()) as u32, particles.len()).as_str(),
+            format!("fps: {}\nparticles: {}", fps_counter.fps(), particles.len()).as_str(),
             Vec2::ZERO,
             8.0,
             0xffffff,
