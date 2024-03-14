@@ -3,8 +3,6 @@ mod emitter;
 mod fps_counter;
 mod particle;
 mod renderer;
-
-use color::Color;
 use emitter::{EmitShape, Emitter, EmitterOptions, RangedOption};
 use fps_counter::FpsCounter;
 use particle::Particle;
@@ -28,7 +26,7 @@ const EXPLOSION_EMITTER_OPTS: EmitterOptions = EmitterOptions {
     drag_coefficient: RangedOption::Range(0.1..=1.0),
     gravity: 250.0,
     start_color: 0xFF8700,
-    start_color_variation: 30.0,
+    start_color_variation: 25.0,
     end_color: 0,
     end_color_variation: 0.0,
 };
@@ -129,7 +127,7 @@ fn main() {
             Vec2::ZERO,
             8.0,
             0xffffff,
-            true,
+            false,
         );
 
         renderer.display(&mut window);

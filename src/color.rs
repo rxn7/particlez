@@ -3,6 +3,7 @@ use glam::Vec3;
 pub struct Color;
 
 impl Color {
+    #[inline]
     pub fn to_rgb(c: u32) -> (u8, u8, u8) {
         let r: u8 = ((c >> 16) & 0xFF) as u8;
         let g: u8 = ((c >> 8) & 0xFF) as u8;
@@ -11,15 +12,18 @@ impl Color {
         (r, g, b)
     }
 
+    #[inline]
     pub fn to_rgbf(c: u32) -> Vec3 {
         let (r, g, b) = Color::to_rgb(c);
         Vec3::new(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0)
     }
 
+    #[inline]
     pub fn from_rgb(r: u8, g: u8, b: u8) -> u32 {
         ((r as u32) << 16) | ((g as u32) << 8) | (b as u32)
     }
 
+    #[inline]
     pub fn from_rgbf(rgbf: Vec3) -> u32 {
         let (r, g, b) = (rgbf.x * 255.0, rgbf.y * 255.0, rgbf.z * 255.0);
         Color::from_rgb(r as u8, g as u8, b as u8)
@@ -47,6 +51,7 @@ impl Color {
         Color::from_rgbf(result)
     }
 
+    #[inline]
     pub fn negative(c: u32) -> u32 {
         let (r, g, b) = Color::to_rgb(c);
         Color::from_rgb(255 - r, 255 - g, 255 - b)
